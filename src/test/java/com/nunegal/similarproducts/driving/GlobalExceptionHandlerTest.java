@@ -24,7 +24,7 @@ class GlobalExceptionHandlerTest {
     assertThat(body).isNotNull();
     assertThat(body.get("status")).isEqualTo(404);
     assertThat(body.get("error")).isEqualTo("Not Found");
-    assertThat(body.get("message")).isEqualTo("Product not found: " + productId);
+    assertThat(body.get("message")).isEqualTo(productId);
     assertThat(body.get("timestamp")).isNotNull();
   }
   

@@ -1,6 +1,7 @@
 package com.nunegal.similarproducts.application;
 
 import com.nunegal.similarproducts.domain.ProductDetail;
+import com.nunegal.similarproducts.domain.exception.ProductNotFoundException;
 import com.nunegal.similarproducts.driven.ProductClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -66,13 +67,17 @@ class ProductServiceTest {
   }
   
   @Test
-  @DisplayName("Should return empty when fetching similar product IDs fails")
-  void shouldReturnEmpty_whenSimilarIdsFails() {
+  @DisplayName("Should propagate ProductNotFoundException when fetching similar product IDs fails")
+  void shouldThrowProductNotFound_whenSimilarIdsFails() {
     String productId = "1";
     
-    when(productClient.getSimilarProductIds(productId)).thenReturn(Flux.error(new RuntimeException("Simulado")));
+    when(productClient.getSimilarProductIds(productId))
+        .thenReturn(Flux.error(new RuntimeException("Service unavailable")));
     
     StepVerifier.create(productService.getSimilarProducts(productId))
-        .verifyComplete();
+        .expectErrorMatches(e ->
+            e instanceof ProductNotFoundException &&
+                e.getMessage().equals("Main product not found: 1"))
+        .verify();
   }
 }
